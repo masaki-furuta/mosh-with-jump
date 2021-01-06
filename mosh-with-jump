@@ -92,4 +92,4 @@ echo "target port: $target_port"
 ssh -tt -n "$proxy" socat udp-l:"$proxy_port",fork udp:"$target_host":"$target_port" 2>&1 &
 trap 'kill -TERM -$$' EXIT
 
-MOSH_KEY=$key mosh-client "$proxy_ip" "$proxy_port"
+MOSH_PREDICTION_DISPLAY=experimental MOSH_KEY=$key mosh-client "$proxy_ip" "$proxy_port"
