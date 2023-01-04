@@ -12,6 +12,10 @@ packets through the proxy server.
 Using a jump server
 
     ./mosh-with-jump -J $jump_server $destination
+
+Using a jump server with a specific SSH port
+
+    ./mosh-with-jump -S 2022 -J $jump_server $destination
     
 With ports specified (for the target server)
 
