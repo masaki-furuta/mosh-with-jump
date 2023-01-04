@@ -24,6 +24,15 @@ while [[ $# -gt 0 ]]; do
       shift
       proxy_port=$1
       ;;
+# Remote proxy SSH port definition section
+    --ssh-port=*)
+      ssh_port=${1#--ssh-port=}
+      ;;
+    -S | --ssh-port)
+      shift
+      ssh_port=$1
+      ;;
+# End of SSH port definition
     -p)
       mosh_server_args+=("$1" "$2")
       shift
@@ -51,7 +60,10 @@ fi
 # that we can get the host. however, we'll continue using $proxy and $target for
 # SSH itself.
 proxy_host=$(ssh -G "$proxy" | perl -anE '/^hostname (.+)/ && print "$1"')
-proxy_ip=$(dig "$proxy_host" +short)
+# Ensure that only the IP address is returned esp in cases involving ALIASES/CNAMES
+#proxy_ip=$(dig "$proxy_host" +short | tail -n1)
+# OR
+proxy_ip=$(dig "$proxy_host" +short | grep '^[.0-9]*$')
 target_host=$(ssh -G "$target" | perl -anE '/^hostname (.+)/ && print "$1"')
 
 echo "proxy: $proxy"
@@ -61,7 +73,7 @@ echo "target: $target"
 echo "target host: $target_host"
 
 # start up the mosh server via the proxy
-mosh_server_out=$(ssh -J "$proxy" "$target" -- mosh-server new -c 256 -s -l LANG=en_US.UTF-8 -l LANGUAGE=en_US "${mosh_server_args[@]}")
+mosh_server_out=$(ssh -J "$proxy":"$ssh_port" "$target" -- mosh-server new -c 256 -s -l LANG=en_US.UTF-8 -l LANGUAGE=en_US "${mosh_server_args[@]}")
 
 # parse out the port and key; we'll need the port for proxying
 connect_line=$(grep -m1 '^MOSH CONNECT ' <<< "$mosh_server_out")
@@ -81,7 +93,9 @@ done
 exit 1
 EOF
   )
-  proxy_port=$(ssh -n "$proxy" bash -c "${find_free_port_cmd@Q}")
+# Refactored for SSH Port + backwards compatibility with outdated shells
+#  proxy_port=$(ssh -p "$ssh_port" -n "$proxy" bash -c "${find_free_port_cmd@Q}")
+  proxy_port=$(ssh -p "$ssh_port" -n "$proxy" bash -c "printf '%q\n' "${find_free_port_cmd}"")
 fi
 
 echo "proxy port: $proxy_port"
@@ -89,7 +103,8 @@ echo "target port: $target_port"
 
 # set up UDP proxying
 # overall, we have client <--> proxy:$proxy_port <--> target:$target_port
-ssh -tt -n "$proxy" socat udp-l:"$proxy_port",fork udp:"$target_host":"$target_port" 2>&1 &
+# added the SSH Port section
+ssh -p "$ssh_port" -tt -n "$proxy" socat udp-l:"$proxy_port",fork udp:"$target_host":"$target_port" 2>&1 &
 trap 'kill -TERM -$$' EXIT
 
 MOSH_PREDICTION_DISPLAY=experimental MOSH_KEY=$key mosh-client "$proxy_ip" "$proxy_port"
