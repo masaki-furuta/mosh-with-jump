@@ -16,15 +16,19 @@ Using a jump server
 Using a jump server with a specific SSH port
 
     ./mosh-with-jump -S 2022 -J $jump_server $destination
-    
+
 With ports specified (for the target server)
 
     ./mosh-with-jump -p 61000:61100 -J $jump_server $destination
 
+With all options specified
+
+        ./mosh-with-jump -S 2022 -p 61000:61100 -J $jump_server $destination
+
 Using no jump server (just calls `mosh`)
-    
+
     ./mosh-with-jump $destination
-    
+
 ## Requirements
 
 mosh-with-jump was written with some portability in mind and uses some fairly
