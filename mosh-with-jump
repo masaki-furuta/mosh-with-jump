@@ -93,9 +93,8 @@ done
 exit 1
 EOF
   )
-# Refactored for SSH Port + backwards compatibility with outdated shells
 #  proxy_port=$(ssh -p "$ssh_port" -n "$proxy" bash -c "${find_free_port_cmd@Q}")
-  proxy_port=$(ssh -p "$ssh_port" -n "$proxy" bash -c "printf '%q\n' "${find_free_port_cmd}"")
+  proxy_port=$(ssh -p "$ssh_port" -n "$proxy" bash -c "'$find_free_port_cmd'")
 fi
 
 echo "proxy port: $proxy_port"
