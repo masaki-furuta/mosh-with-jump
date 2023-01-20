@@ -94,6 +94,7 @@ exit 1
 EOF
   )
 #  proxy_port=$(ssh -p "$ssh_port" -n "$proxy" bash -c "${find_free_port_cmd@Q}")
+# Changed the bash -c "${find_free_port_cmd@Q} to bash -c "'$find_free_port_cmd'" to handle multiple shells (Bash, Fish, Zsh etc)
   proxy_port=$(ssh -p "$ssh_port" -n "$proxy" bash -c "'$find_free_port_cmd'")
 fi
 
