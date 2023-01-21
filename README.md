@@ -32,6 +32,6 @@ Using no jump server (just calls `mosh`)
 ## Requirements
 
 mosh-with-jump was written with some portability in mind and uses some fairly
-common Unix utilities. All machines involved must have SSH. Only the client and
-target machines need to have Mosh. The proxy server uses socat to proxy and ss
+common Unix utilities. All machines involved must have [SSH](https://www.openssh.com/). Only the client and
+target machines need to have Mosh. The proxy server uses [socat](http://www.dest-unreach.org/socat) to proxy and [ss](https://linux.die.net/man/8/ss)
 to query for in-use ports.
