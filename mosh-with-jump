@@ -60,10 +60,16 @@ fi
 # that we can get the host. however, we'll continue using $proxy and $target for
 # SSH itself.
 proxy_host=$(ssh -G "$proxy" | perl -anE '/^hostname (.+)/ && print "$1"')
+
 # Ensure that only the IP address is returned esp in cases involving ALIASES/CNAMES
-#proxy_ip=$(dig "$proxy_host" +short | tail -n1)
-# OR
+# if proxy host is ip address, then use proxy_host directly
+if [[ "$proxy_host" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+proxy_ip=$proxy_host
+else
+# otherwise, convert hostname to IP address
 proxy_ip=$(dig "$proxy_host" +short | grep '^[.0-9]*$')
+fi
+
 target_host=$(ssh -G "$target" | perl -anE '/^hostname (.+)/ && print "$1"')
 
 echo "proxy: $proxy"
@@ -81,7 +87,7 @@ target_port=$(perl -anE 'print $F[2]' <<< "$connect_line")
 key=$(perl -anE 'print $F[3]' <<< "$connect_line")
 
 if [[ -z $proxy_port ]]; then
-  # we'll need find a free port on the proxy, which might be different from the target
+  # we'll need to find a free port on the proxy, which might be different from the target
   find_free_port_cmd=$(
     cat << EOF
 for (( p=$target_port ; p < $target_port + 10; p++ )); do
