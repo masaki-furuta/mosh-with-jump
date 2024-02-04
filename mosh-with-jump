@@ -87,7 +87,7 @@ target_port=$(perl -anE 'print $F[2]' <<< "$connect_line")
 key=$(perl -anE 'print $F[3]' <<< "$connect_line")
 
 if [[ -z $proxy_port ]]; then
-  # we'll need to find a free port on the proxy, which might be different from the target
+  # We'll need to find a free port on the proxy, that might be different from the target
   find_free_port_cmd=$(
     cat << EOF
 for (( p=$target_port ; p < $target_port + 10; p++ )); do
