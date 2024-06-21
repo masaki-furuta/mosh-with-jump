@@ -12,18 +12,26 @@ packets through the proxy server.
 Using a jump server
 
     ./mosh-with-jump -J $jump_server $destination
-    
+
+Using a jump server with a specific SSH port
+
+    ./mosh-with-jump -S 2022 -J $jump_server $destination
+
 With ports specified (for the target server)
 
     ./mosh-with-jump -p 61000:61100 -J $jump_server $destination
 
+With all options specified
+
+        ./mosh-with-jump -S 2022 -p 61000:61100 -J $jump_server $destination
+
 Using no jump server (just calls `mosh`)
-    
+
     ./mosh-with-jump $destination
-    
+
 ## Requirements
 
 mosh-with-jump was written with some portability in mind and uses some fairly
-common Unix utilities. All machines involved must have SSH. Only the client and
-target machines need to have Mosh. The proxy server uses socat to proxy and ss
+common Unix utilities. All machines involved must have [SSH](https://www.openssh.com/). Only the client and
+target machines need to have Mosh. The proxy server uses [socat](http://www.dest-unreach.org/socat) to proxy and [ss](https://linux.die.net/man/8/ss)
 to query for in-use ports.
